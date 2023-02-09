@@ -7,7 +7,7 @@ _A script that downloads files from Vimm's lair._
 ## How-to:
 Simple:
   Fill the ```list.txt``` file with links separated by new-lines and run the script (```main.py```)
-
+  Files are saved in ```Downloads/vdmDownloads/```
 Advanced:
   run ``` main.py --help ```
 
