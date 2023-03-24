@@ -25,28 +25,28 @@ def find_meta_from_url(url):
 
 def download_file(mediaId, chunk_size=1024 * 8, host="download3.vimm.net", referer="https://vimm.net/",
                   user_agent="User-Agent: Mozilla/5.0"):
-    with requests.get("https://download3.vimm.net/download/",
-                      stream=True,
-                      params={"mediaId": str(mediaId)},
-                      headers={"User-Agent": user_agent,
-                               "Host": host,
-                               "Referer": referer}) as r:
-        r.raise_for_status()
+        with requests.get(f"https://{host}/download/",
+                          stream=True,
+                          params={"mediaId": str(mediaId)},
+                          headers={"User-Agent": user_agent,
+                                   "Host": host,
+                                   "Referer": referer}) as r:
+            r.raise_for_status()
 
-        d = r.headers['content-disposition']
-        local_filename = re.findall("filename=(.+)", d)[0]
-        local_filename = local_filename.translate({ord(i): None for i in "\"'"})
-        print(local_filename)
-        info("Downloading " + str(local_filename))
-        full_download_path = args.outfolder
-        if not os.path.exists(full_download_path):
-            os.makedirs(full_download_path)
-        with open(full_download_path + local_filename, 'wb') as f:
-            total_length = int(r.headers.get('content-length'))
-            for chunk in progress.bar(r.iter_content(chunk_size=chunk_size),
-                                      expected_size=(total_length / chunk_size) + 1):
-                f.write(chunk)
-    return local_filename
+            d = r.headers['content-disposition']
+            local_filename = re.findall("filename=(.+)", d)[0]
+            local_filename = local_filename.translate({ord(i): None for i in "\"'"})
+            print(local_filename)
+            info("Downloading " + str(local_filename))
+            full_download_path = args.outfolder
+            if not os.path.exists(full_download_path):
+                os.makedirs(full_download_path)
+            with open(full_download_path + local_filename, 'wb') as f:
+                total_length = int(r.headers.get('content-length'))
+                for chunk in progress.bar(r.iter_content(chunk_size=chunk_size),
+                                          expected_size=(total_length / chunk_size) + 1):
+                    f.write(chunk)
+        return local_filename
 
 
 def parse_input(filename):
@@ -106,4 +106,10 @@ if __name__ == '__main__':
     input_file = args.infile
     queue = parse_input(input_file)
     for download_entry in queue:
-        download_file(download_entry['media_id'])
+        download_hosts = ["download3.vimm.net", "download5.vimm.net"]
+        while len(download_hosts) != 0:
+            try:
+                download_file(download_entry['media_id'], host=download_hosts.pop())
+                break
+            except:
+                pass
