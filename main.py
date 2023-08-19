@@ -106,7 +106,7 @@ if __name__ == '__main__':
     input_file = args.infile
     queue = parse_input(input_file)
     for download_entry in queue:
-        download_hosts = ["download3.vimm.net", "download5.vimm.net"]
+        download_hosts = ["download{}.vimm.net".format(i + 1) for i in range(19)]
         while len(download_hosts) != 0:
             try:
                 download_file(download_entry['media_id'], host=download_hosts.pop())
